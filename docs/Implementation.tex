@@ -1,0 +1,88 @@
+\documentclass[a4paper]{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage[noend]{algpseudocode}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{bbm}
+\usepackage{hyperref}
+
+\title{Implementing Augmented Memory Networks}
+\author{Liam Whittle}
+
+\algdef{SE}[DOWHILE]{Do}{doWhile}{\algorithmicdo}[1]{\algorithmicwhile\ #1}
+
+\begin{document}	
+\maketitle
+
+\begin{abstract}
+	Attempting to implement the augmented memory networks from three Google Deep Mind papers in python3 and PyTorch to support easily configurable and customizable network architectures. Implementing efficient attention mechanisms as they are described for the Neural Turing Machine \cite{graves2014neural}, the Differentiable Neural Computer \cite{graves2016hybrid}, and Sparse Access Memory \cite{rae2016scaling}.
+\end{abstract}
+
+\section{Mathematics}
+
+The notation used here is intended to map closely to the code. 
+
+\begin{table}
+\caption{Notation}
+\begin{tabularx}{\textwidth}{@{}XX@{}}
+\toprule
+  $\odot$ & Hadamard Product \\
+  $\cdot$  & Matrix Multiplication \\
+  $\mathbbm{1}$  & Matrix of Ones\\
+  $I$  & Identity Matrix\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Memory}: each of n rows of width w are an "entry" in memory
+
+\[ M = \begin{bmatrix} 
+
+    m_{11} 	& 	\dots 		& 	m_{1w} 	\\
+    \vdots   	&   	\ddots 		&       	\\
+    m_{n1} 	&       \dots  		&   	m_{nw} 
+
+\end{bmatrix}
+\]
+
+\textbf{Attention}: an attention vector is a vector of size n referring to which rows of a memory matrix to ``focus'' on. A refers to the vector form, $A^D$ refers to the diagonalized form as shown. We use the same notation for later vectors such as the erase and add vectors.
+
+A = [$a_1$, ..., $a_n$] 
+
+\[ A^D = \begin{bmatrix} 
+
+    a_{1} 	& 	0 		& 	\dots 	\\
+    0   	&   	\ddots 		&       	\\
+    \vdots 	&       0  		&   	a_{n} 
+
+\end{bmatrix}
+\]
+
+\textbf{Write and Erase Vectors}
+
+E = [$e_1$, ..., $e_w$]
+X = [$x_1$, ..., $x_w$]
+
+\paragraph{Writing to Memory}
+Writing to memory is the process of generating an entirely new memory matrix by performing an erase and an add. 
+
+\paragraph{Erasing} 
+$M_{e} = M - A^D \cdot (E^D \cdot \mathbbm{1})$
+
+\paragraph{Adding}
+$M_{x} = M + A^D \cdot (X^D \cdot \mathbbm{1})$
+
+\paragraph{Erasing and Writting Combined} \footnote{\textit{ntm.py}: WriteHead.forward}
+$M' = M + A^D \cdot (X^D \cdot \mathbbm{1} - E^D \cdot \mathbbm{1})$
+
+% bibliography
+\bibliographystyle{ieeetran}
+\bibliography{references.bib}
+
+\end{document}
